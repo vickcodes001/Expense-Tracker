@@ -1,143 +1,158 @@
-// get the button that will show the modal
-const modalBtn = document.getElementById("modal-btn");
+// ---------------- CATEGORY CUSTOM SELECT ----------------
+const customSelect = document.getElementById("custom-category-select");
+const trigger = customSelect.querySelector(".custom-select-trigger");
+const triggerText = trigger.querySelector("span");
+const hiddenInput = document.getElementById("category-select");
+const optionsContainer = customSelect.querySelector(".custom-options");
 
-// show modal
-const modalContainer = document.getElementById("modal-container");
-const remove = document.getElementById("cancel-modal");
+["Food", "Rent", "Transport", "Relaxing"].forEach(createCategory);
 
-modalBtn.addEventListener("click", showModal);
-remove.addEventListener("click", removeModal);
-
-function showModal() {
-  console.log("this was clicked");
-  modalContainer.classList.remove("d-none");
-}
-
-// close modal
-function removeModal() {
-  console.log("this is to close the modal");
-  modalContainer.classList.add("d-none");
-}
-
-// adding new expense to the category dropdown
-const inputValue = document.getElementById("new-expense-input");
-const addExpenseBtn = document.getElementById("add-expense"); //stored the value of add button
-const category = document.getElementById("category-select"); //stored the value of category
-const amountInput = document.getElementById("amount-input"); //stored the value of amount
-const dateInput = document.getElementById("date-input"); //stored the value of date
-
-// THIS IS THE ADD EXPENSE BTN CATEGORY
-addExpenseBtn.addEventListener("click", () => {
-  const newCategory = document.createElement("option");
-
-  newCategory.textContent = inputValue.value;
-
-  const newValue = inputValue.value;
-
-  if (newValue === "") {
-    alert("put in a value");
-    return
-  }
-
-  for (let option of category.options) {
-    if (option.text === newValue) {
-      alert("This category already exists!");
-      return;
-    }
-  }
-
-  category.appendChild(newCategory);
-  modalContainer.classList.add("d-none");
-
-  inputValue.value = "";
+trigger.addEventListener("click", (e) => {
+  e.stopPropagation();
+  customSelect.classList.toggle("open");
 });
 
-// send selected category to category table head
-const addBtn = document.getElementById("add-btn");
-categoryValue = category.value;
+document.addEventListener("click", () => {
+  customSelect.classList.remove("open");
+  dateSelect.classList.remove("open");
+});
 
-addBtn.addEventListener("click", () => {
-  const tableBody = document.getElementById("expense-table-body");
-  const selectedIndex = category.selectedIndex; // Get the selected index (e.g., 0 or 1)
-  const selectedOption = category.options[selectedIndex]; // Get the <option> element at that index
-  const selectedAmount = amountInput.value; //Got the value of amount input
-  const selectedText = selectedOption.text; // Get the visible text of that option
-  const selectedDate = dateInput.value; // Got the value of date stored in a variable
+function createCategory(value) {
+  const opt = document.createElement("div");
+  opt.className = "custom-option";
+  opt.dataset.value = value;
+  opt.textContent = value;
 
-  // if nothing was selected, return nothing
-  if (!selectedText) return;
-  if (!selectedAmount) return;
-  if (!selectedDate) return;
-
-  const row = document.createElement("tr");
-  const categoryCell = document.createElement("td"); // cell becomes the new table data created
-  categoryCell.textContent = selectedText; //food was selected
-  const amountCell = document.createElement("td"); // new cell was created for amount input
-  amountCell.textContent = selectedAmount; // the value of amount input was stored in the cell
-  const dateCell = document.createElement("td"); // new cell was created for amount input
-  dateCell.textContent = selectedDate; // the value of amount input was stored in the cell
-
-  const deleteCell = document.createElement("td");
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Delete";
-  deleteBtn.style.backgroundColor = "red";
-  deleteBtn.style.color = "white";
-  deleteBtn.style.border = "none";
-  deleteBtn.style.padding = "4px 10px";
-  deleteBtn.style.cursor = "pointer";
-  deleteBtn.style.borderRadius = "10px";
-
-  deleteBtn.addEventListener("click", () => {
-    row.remove();
-    updateTotal();
+  opt.addEventListener("click", () => {
+    triggerText.textContent = value;
+    hiddenInput.value = value;
+    customSelect.classList.remove("open");
   });
 
-  deleteCell.appendChild(deleteBtn);
-  // console.log(deleteValue);
-  // console.log(deleteCell);
+  optionsContainer.appendChild(opt);
+}
 
-  row.appendChild(categoryCell);
-  row.appendChild(amountCell); // the cellTwo that had the value of amount input was appended to row
-  row.appendChild(dateCell);
+// ---------------- DATE CUSTOM SELECT ----------------
+const dateSelect = document.getElementById("custom-date-select");
+const dateTrigger = dateSelect.querySelector(".custom-select-trigger");
+const dateTriggerText = dateTrigger.querySelector("span");
+const dateOptions = document.getElementById("date-options");
+const dateInput = document.getElementById("date-input");
+
+dateTrigger.addEventListener("click", (e) => {
+  e.stopPropagation();
+  dateSelect.classList.toggle("open");
+});
+
+for (let i = 0; i < 100; i++) {
+  const d = new Date();
+  d.setDate(d.getDate() - i);
+  const formatted = d.toISOString().split("T")[0];
+
+  const opt = document.createElement("div");
+  opt.className = "custom-option";
+  opt.dataset.value = formatted;
+  opt.textContent = formatted;
+
+  opt.addEventListener("click", () => {
+    dateOptions
+      .querySelectorAll(".custom-option")
+      .forEach((o) => o.classList.remove("selected"));
+
+    opt.classList.add("selected");
+    dateTriggerText.textContent = formatted;
+    dateInput.value = formatted;
+    dateSelect.classList.remove("open");
+  });
+
+  dateOptions.appendChild(opt);
+}
+
+// ---------------- MODAL ----------------
+const modalBtn = document.getElementById("modal-btn");
+const modalContainer = document.getElementById("modal-container");
+const cancelModal = document.getElementById("cancel-modal");
+
+modalBtn.onclick = () => modalContainer.classList.remove("d-none");
+cancelModal.onclick = () => modalContainer.classList.add("d-none");
+
+// ---------------- ADD CATEGORY ----------------
+const inputValue = document.getElementById("new-expense-input");
+const addExpenseBtn = document.getElementById("add-expense");
+
+addExpenseBtn.addEventListener("click", () => {
+  const value = inputValue.value.trim();
+  if (!value) return alert("Enter category name");
+
+  const exists = [...optionsContainer.children].some(
+    (opt) => opt.dataset.value === value
+  );
+
+  if (exists) return alert("Category already exists");
+
+  createCategory(value);
+  inputValue.value = "";
+  modalContainer.classList.add("d-none");
+});
+
+// ---------------- ADD EXPENSE ----------------
+const addBtn = document.getElementById("add-btn");
+const amountInput = document.getElementById("amount-input");
+
+addBtn.addEventListener("click", () => {
+  const category = hiddenInput.value;
+  const amount = amountInput.value;
+  const date = dateInput.value;
+
+  if (!category || !amount || !date) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+          <td data-label="Category">${category}</td>
+          <td data-label="Amount">${amount}</td>
+          <td data-label="Date">${date}</td>
+        `;
+
+  const deleteCell = document.createElement("td");
+  const deleteBtn = document.createElement("button");
+
+  deleteBtn.textContent = "Delete";
+  deleteBtn.className = "btn-delete";
+
+  deleteBtn.onclick = () => {
+    row.remove();
+    updateTotal();
+  };
+
+  deleteCell.appendChild(deleteBtn);
   row.appendChild(deleteCell);
 
-  tableBody.appendChild(row);
+  document.getElementById("expense-table-body").appendChild(row);
 
-  // clearing off the values after clicking add btn
   amountInput.value = "";
+  hiddenInput.value = "";
   dateInput.value = "";
-  category.selectedIndex = 0;
+  triggerText.textContent = "Select a category";
+  dateTriggerText.textContent = "Select a date";
 
   updateTotal();
 });
 
-// get the total amount updated anytime a new row is added
+// ---------------- TOTAL ----------------
 function updateTotal() {
-  const rows = document.querySelectorAll("#expense-table-body tr");
   let total = 0;
-
-  rows.forEach((row) => {
-    const amountCell = row.cells[1];
-    if (amountCell) {
-      const value = parseFloat(amountCell.textContent);
-      if (!isNaN(value)) {
-        total += value;
-      }
-    }
+  document.querySelectorAll("#expense-table-body tr").forEach((row) => {
+    total += parseFloat(row.cells[1].textContent);
   });
 
   document.getElementById("total-amount").textContent = total.toFixed(2);
 }
 
+// ---------------- AUTH NAME ----------------
+const userNameParagraph = document.getElementById("user-name-paragraph");
+const savedUserName = localStorage.getItem("loginName");
 
-//  AUTHENTICATION
-
-const userNameParagraph = document.getElementById("user-name-paragraph")
-const savedUserName = localStorage.getItem("loginName")
-
-if (savedUserName) {
-  userNameParagraph.textContent = `Welcome, ${savedUserName}`
-} else {
-  userNameParagraph.textContent = "Welcome, guest!"
-}
+userNameParagraph.textContent = savedUserName
+  ? `Welcome, ${savedUserName}`
+  : "Welcome, guest!";

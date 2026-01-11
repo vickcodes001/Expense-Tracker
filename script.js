@@ -1,3 +1,36 @@
+// ---------------- AUTHENTICATION CHECK ----------------
+// Check if user is logged in - MUST BE AT THE TOP
+if (localStorage.getItem("isLoggedIn") !== "true") {
+  window.location.href = "login.html";
+}
+
+// ---------------- DISPLAY USER NAME ----------------
+const userNameParagraph = document.getElementById("user-name-paragraph");
+const savedUserName = localStorage.getItem("loginName");
+
+if (savedUserName) {
+  userNameParagraph.textContent = `Welcome, ${savedUserName}!`;
+} else {
+  userNameParagraph.textContent = "Welcome, guest!";
+}
+
+// ---------------- LOGOUT FUNCTIONALITY ----------------
+const logoutText = document.getElementById("logout-text");
+
+if (logoutText) {
+  logoutText.addEventListener("click", () => {
+    if (confirm("Are you sure you want to logout?")) {
+      // Clear all login data
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("loginName");
+      localStorage.removeItem("loginEmail");
+
+      // Redirect to login page
+      window.location.href = "login.html";
+    }
+  });
+}
+
 // ---------------- CATEGORY CUSTOM SELECT ----------------
 const customSelect = document.getElementById("custom-category-select");
 const trigger = customSelect.querySelector(".custom-select-trigger");
@@ -109,10 +142,10 @@ addBtn.addEventListener("click", () => {
   const row = document.createElement("tr");
 
   row.innerHTML = `
-          <td data-label="Category">${category}</td>
-          <td data-label="Amount">${amount}</td>
-          <td data-label="Date">${date}</td>
-        `;
+    <td data-label="Category">${category}</td>
+    <td data-label="Amount">${amount}</td>
+    <td data-label="Date">${date}</td>
+  `;
 
   const deleteCell = document.createElement("td");
   const deleteBtn = document.createElement("button");
@@ -148,11 +181,3 @@ function updateTotal() {
 
   document.getElementById("total-amount").textContent = total.toFixed(2);
 }
-
-// ---------------- AUTH NAME ----------------
-const userNameParagraph = document.getElementById("user-name-paragraph");
-const savedUserName = localStorage.getItem("loginName");
-
-userNameParagraph.textContent = savedUserName
-  ? `Welcome, ${savedUserName}`
-  : "Welcome, guest!";

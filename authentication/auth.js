@@ -34,7 +34,7 @@ if (signupForm) {
       .toLowerCase();
     const password = document.getElementById("signup-password").value;
     const confirmPassword = document.getElementById(
-      "signup-confirm-password"
+      "signup-confirm-password",
     ).value;
     const errorDiv = document.getElementById("signup-error");
 
@@ -152,3 +152,31 @@ if (loginForm) {
     window.location.href = "../index.html";
   });
 }
+
+// ========== UNIVERSAL SHOW / HIDE PASSWORD ==========
+const toggleButtons = document.querySelectorAll(".toggle-password");
+
+toggleButtons.forEach((icon) => {
+  const input = icon.previousElementSibling;
+
+  // Create open eye image dynamically
+  const openEye = document.createElement("img");
+  openEye.src = "/icon-eye.png";
+  openEye.alt = "Hide password";
+  openEye.classList.add("toggle-password");
+  openEye.style.display = "none";
+
+  icon.parentElement.appendChild(openEye);
+
+  icon.addEventListener("click", () => {
+    input.type = "text";
+    icon.style.display = "none";
+    openEye.style.display = "block";
+  });
+
+  openEye.addEventListener("click", () => {
+    input.type = "password";
+    openEye.style.display = "none";
+    icon.style.display = "block";
+  });
+});
